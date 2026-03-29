@@ -3,6 +3,11 @@ import PropTypes from 'prop-types'
 function RecipeCard({ recipe, onSelect }) {
   const heartLabel = recipe.isFavorite ? 'Favorite recipe' : 'Not favorite recipe'
 
+  const handleImageError = (event) => {
+    event.currentTarget.onerror = null
+    event.currentTarget.src = 'https://images.unsplash.com/photo-1495546968767-f0573cca821e?auto=format&fit=crop&w=1400&q=80'
+  }
+
   return (
     <article className="recipeCard">
       <button
@@ -13,7 +18,7 @@ function RecipeCard({ recipe, onSelect }) {
       />
 
       <div className="cardTopGlow">
-        <img className="cardImage" src={recipe.imageUrl} alt={recipe.title} />
+        <img className="cardImage" src={recipe.imageUrl} alt={recipe.title} onError={handleImageError} />
         <div className="cardImageOverlay" />
         <span
           className={`favoriteBadge ${recipe.isFavorite ? 'isFavorite' : 'isNotFavorite'}`}

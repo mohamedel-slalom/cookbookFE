@@ -25,7 +25,7 @@ export const MOCK_RECIPES = [
     difficulty: 'Easy',
     tags: ['breakfast'],
     isFavorite: false,
-    imageUrl: 'https://images.unsplash.com/photo-1603046891744-76e6300f0d6f?auto=format&fit=crop&w=1400&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=1400&q=80',
     description: 'Crispy toast topped with creamy avocado, lemon, and chili flakes.',
     servings: 2,
     ingredients: ['2 slices sourdough', '1 ripe avocado', '1 tsp lemon juice', 'Salt', 'Chili flakes'],
