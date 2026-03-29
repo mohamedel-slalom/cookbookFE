@@ -1,3 +1,7 @@
+export const MOCK_CURRENT_USER = {
+  firstName: 'Mohamed',
+}
+
 export const MOCK_RECIPES = [
   { id: 1, title: 'Creamy Garlic Pasta', cuisine: 'Italian', time: '25 min', difficulty: 'Easy' },
   { id: 2, title: 'Spicy Chicken Tacos', cuisine: 'Mexican', time: '30 min', difficulty: 'Easy' },
