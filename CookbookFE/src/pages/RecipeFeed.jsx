@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import RecipeCarousel from '../components/RecipeCarousel'
 import RecipeDetailModal from '../components/RecipeDetailModal'
 import { MOCK_CURRENT_USER, MOCK_RECIPES } from '../constants'
@@ -6,11 +6,15 @@ import '../App.css'
 
 function RecipeFeed() {
   const [selectedRecipe, setSelectedRecipe] = useState(null)
-  const pageTitle = `${MOCK_CURRENT_USER.firstName}'s Family Recipes`
+  const pageTitle = `${MOCK_CURRENT_USER.firstName}'s Cookbook 🔥`
   const favoriteRecipes = MOCK_RECIPES.filter((recipe) => recipe.isFavorite)
   const breakfastRecipes = MOCK_RECIPES.filter((recipe) => recipe.tags.includes('breakfast'))
   const lunchRecipes = MOCK_RECIPES.filter((recipe) => recipe.tags.includes('lunch'))
   const dinnerRecipes = MOCK_RECIPES.filter((recipe) => recipe.tags.includes('dinner'))
+
+  useEffect(() => {
+    document.title = pageTitle
+  }, [pageTitle])
 
   return (
     <main className="page">
