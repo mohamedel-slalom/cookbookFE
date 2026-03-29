@@ -9,7 +9,7 @@ function RecipeFeed() {
   const [selectedRecipe, setSelectedRecipe] = useState(null)
   const [isAddRecipeOpen, setIsAddRecipeOpen] = useState(false)
   const pageTitle = `${MOCK_CURRENT_USER.firstName}'s Cookbook`
-  const tabTitle = `${MOCK_CURRENT_USER.firstName}'s Cookbook 🍳`
+  const tabTitle = `${MOCK_CURRENT_USER.firstName}'s Cookbook\u2003🍳`
   const favoriteRecipes = MOCK_RECIPES.filter((recipe) => recipe.isFavorite)
   const breakfastRecipes = MOCK_RECIPES.filter((recipe) => recipe.tags.includes('breakfast'))
   const lunchRecipes = MOCK_RECIPES.filter((recipe) => recipe.tags.includes('lunch'))
