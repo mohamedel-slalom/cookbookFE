@@ -3,11 +3,13 @@ import { MOCK_CURRENT_USER, MOCK_RECIPES } from '../constants'
 import '../App.css'
 
 function RecipeFeed() {
+  const pageTitle = `${MOCK_CURRENT_USER.firstName}'s Family Recipes`
+
   return (
     <main className="page">
       <section className="hero">
         <p className="eyebrow">Cookbook</p>
-        <h1 className="title">{MOCK_CURRENT_USER.firstName}'s Family Recipes</h1>
+        <h1 className="title">{pageTitle}</h1>
       </section>
 
       <RecipeCarousel title="Favorites" recipes={MOCK_RECIPES} />
