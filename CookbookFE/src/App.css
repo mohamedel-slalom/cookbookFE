@@ -1,0 +1,127 @@
+.page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #0f172a 0%, #020617 55%, #01030a 100%);
+  color: #e2e8f0;
+  padding: 2rem 0 3rem;
+}
+
+.hero,
+.feedSection {
+  width: min(1200px, 92vw);
+  margin: 0 auto;
+}
+
+.hero {
+  margin-bottom: 1.75rem;
+}
+
+.eyebrow {
+  color: #94a3b8;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.title {
+  margin: 0.25rem 0;
+  font-size: clamp(2rem, 5vw, 3rem);
+}
+
+.subtitle {
+  margin: 0;
+  color: #cbd5e1;
+}
+
+.feedHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.feedHeader h2 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.scrollButton {
+  border: 1px solid #334155;
+  background: #0b1222;
+  color: #e2e8f0;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 999px;
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.scrollButton:hover {
+  background: #1e293b;
+}
+
+.recipeRow {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(220px, 280px);
+  gap: 1rem;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding-bottom: 0.75rem;
+}
+
+.recipeRow::-webkit-scrollbar {
+  height: 8px;
+}
+
+.recipeRow::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 999px;
+}
+
+.recipeCard {
+  position: relative;
+  min-height: 220px;
+  border-radius: 14px;
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  overflow: hidden;
+  transition: transform 180ms ease, border-color 180ms ease;
+}
+
+.recipeCard:hover {
+  transform: translateY(-4px) scale(1.02);
+  border-color: #475569;
+}
+
+.cardTopGlow {
+  height: 45%;
+  background: linear-gradient(135deg, #f97316 0%, #ef4444 45%, #8b5cf6 100%);
+}
+
+.cardBody {
+  padding: 0.85rem 0.9rem 1rem;
+}
+
+.cardBody h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.cardBody p {
+  margin: 0.45rem 0 0;
+  color: #94a3b8;
+}
+
+.meta {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: space-between;
+  color: #cbd5e1;
+  font-size: 0.9rem;
+}
