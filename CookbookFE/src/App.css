@@ -89,7 +89,6 @@
 
 .recipeCard {
   position: relative;
-  min-height: 220px;
   border-radius: 14px;
   background: #0f172a;
   border: 1px solid #1e293b;
@@ -102,12 +101,78 @@
   border-color: #475569;
 }
 
+.cardOpenButton {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.cardOpenButton:focus-visible {
+  outline: 2px solid #93c5fd;
+  outline-offset: -2px;
+}
+
 .cardTopGlow {
-  height: 45%;
-  background: linear-gradient(135deg, #f97316 0%, #ef4444 45%, #8b5cf6 100%);
+  aspect-ratio: 16 / 10;
+  position: relative;
+}
+
+.cardImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cardImageOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.28) 0%, rgba(239, 68, 68, 0.2) 45%, rgba(139, 92, 246, 0.26) 100%);
+}
+
+.favoriteBadge {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.65rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.72);
+  border: 1px solid rgba(226, 232, 240, 0.35);
+  color: #fda4af;
+  line-height: 0;
+  pointer-events: none;
+  transform: translateZ(0);
+  z-index: 2;
+}
+
+.favoriteIcon {
+  width: 0.92rem;
+  height: 0.92rem;
+  display: block;
+}
+
+.favoriteBadge.isFavorite {
+  color: #f43f5e;
+  background: rgba(15, 23, 42, 0.82);
+  border-color: rgba(251, 113, 133, 0.65);
+}
+
+.favoriteBadge.isNotFavorite {
+  color: #cbd5e1;
+  background: rgba(15, 23, 42, 0.55);
+  border-color: rgba(203, 213, 225, 0.4);
 }
 
 .cardBody {
+  position: relative;
+  z-index: 0;
   padding: 0.85rem 0.9rem 1rem;
 }
 
@@ -127,4 +192,136 @@
   justify-content: space-between;
   color: #cbd5e1;
   font-size: 0.9rem;
+}
+
+.detailOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(2, 6, 23, 0.88);
+  backdrop-filter: blur(2px);
+  overflow-y: auto;
+  padding: 1.25rem;
+}
+
+.detailPanel {
+  width: min(960px, 96vw);
+  margin: 0 auto;
+  background: #0b1220;
+  border: 1px solid #1e293b;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 25px 60px rgba(2, 6, 23, 0.5);
+}
+
+.detailActions {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  padding: 0.9rem;
+  background: linear-gradient(180deg, rgba(11, 18, 32, 0.95) 0%, rgba(11, 18, 32, 0.75) 100%);
+}
+
+.menuContainer {
+  position: relative;
+}
+
+.detailIconButton {
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 999px;
+  border: 1px solid #334155;
+  background: #0f172a;
+  color: #e2e8f0;
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.detailIconButton:hover {
+  background: #1e293b;
+}
+
+.detailMenu {
+  position: absolute;
+  top: 2.45rem;
+  right: 0;
+  width: max-content;
+  min-width: 180px;
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  padding: 0.35rem;
+}
+
+.detailMenuItem {
+  width: 100%;
+  text-align: left;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #e2e8f0;
+  padding: 0.55rem 0.65rem;
+  cursor: pointer;
+}
+
+.detailMenuItem:hover {
+  background: #1e293b;
+}
+
+.detailImage {
+  width: 100%;
+  max-height: 440px;
+  object-fit: cover;
+  display: block;
+}
+
+.detailContent {
+  padding: 1.25rem 1.25rem 1.5rem;
+}
+
+.detailContent h2 {
+  margin: 0;
+  font-size: clamp(1.6rem, 2.8vw, 2.2rem);
+}
+
+.detailDescription {
+  margin: 0.75rem 0 0;
+  color: #cbd5e1;
+}
+
+.detailMeta {
+  margin-top: 0.85rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.detailMeta span {
+  border: 1px solid #334155;
+  border-radius: 999px;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.82rem;
+  color: #cbd5e1;
+}
+
+.detailSection {
+  margin-top: 1.15rem;
+}
+
+.detailSection h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
+}
+
+.detailSection ul,
+.detailSection ol {
+  margin: 0;
+  padding-left: 1.1rem;
+  color: #e2e8f0;
+  display: grid;
+  gap: 0.35rem;
 }
