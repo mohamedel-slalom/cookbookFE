@@ -9,7 +9,7 @@ import PropTypes from 'prop-types'
  * @param {Array} props.recipes - Recipe data array
  * @returns {JSX.Element}
  */
-function RecipeCarousel({ title, recipes }) {
+function RecipeCarousel({ title, recipes, onRecipeSelect }) {
   const recipeRowRef = useRef(null)
 
   const scrollRecipes = (direction) => {
@@ -47,7 +47,7 @@ function RecipeCarousel({ title, recipes }) {
 
       <div className="recipeRow" ref={recipeRowRef}>
         {recipes.map((recipe) => (
-          <RecipeCard key={recipe.id} recipe={recipe} />
+          <RecipeCard key={recipe.id} recipe={recipe} onSelect={onRecipeSelect} />
         ))}
       </div>
     </section>
@@ -63,8 +63,16 @@ RecipeCarousel.propTypes = {
       cuisine: PropTypes.string.isRequired,
       time: PropTypes.string.isRequired,
       difficulty: PropTypes.string.isRequired,
+      tags: PropTypes.arrayOf(PropTypes.string).isRequired,
+      isFavorite: PropTypes.bool.isRequired,
+      imageUrl: PropTypes.string.isRequired,
+      description: PropTypes.string.isRequired,
+      servings: PropTypes.number.isRequired,
+      ingredients: PropTypes.arrayOf(PropTypes.string).isRequired,
+      steps: PropTypes.arrayOf(PropTypes.string).isRequired,
     })
   ).isRequired,
+  onRecipeSelect: PropTypes.func.isRequired,
 }
 
 export default RecipeCarousel

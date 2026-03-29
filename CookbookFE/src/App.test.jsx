@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi } from 'vitest'
 import RecipeFeed from './pages/RecipeFeed'
+import { MOCK_RECIPES } from './constants'
 
 describe('Recipe Feed', () => {
   it('renders the page heading', () => {
@@ -20,14 +21,20 @@ describe('Recipe Feed', () => {
   it('renders recipe cards in each carousel', () => {
     render(<RecipeFeed />)
     const cards = screen.getAllByRole('article')
-    expect(cards.length).toBeGreaterThanOrEqual(8)
+    const expectedCardCount = MOCK_RECIPES.filter((recipe) => recipe.isFavorite).length
+      + MOCK_RECIPES.filter((recipe) => recipe.tags.includes('breakfast')).length
+      + MOCK_RECIPES.filter((recipe) => recipe.tags.includes('lunch')).length
+      + MOCK_RECIPES.filter((recipe) => recipe.tags.includes('dinner')).length
+
+    expect(cards).toHaveLength(expectedCardCount)
   })
 
-  it('displays recipe titles on the cards', () => {
+  it('renders only tagged recipes in each carousel', () => {
     render(<RecipeFeed />)
-    expect(screen.getAllByText('Creamy Garlic Pasta').length).toBeGreaterThan(0)
-    expect(screen.getAllByText('Spicy Chicken Tacos').length).toBeGreaterThan(0)
-    expect(screen.getAllByText('Lemon Herb Salmon').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Blueberry Pancakes')).toHaveLength(2)
+    expect(screen.getAllByText('Spicy Chicken Tacos')).toHaveLength(2)
+    expect(screen.getAllByText('Mushroom Risotto')).toHaveLength(2)
+    expect(screen.queryByText('Creamy Garlic Pasta')).not.toBeInTheDocument()
   })
 
   it('renders scroll buttons for each carousel', () => {
@@ -51,9 +58,35 @@ describe('Recipe Feed', () => {
     expect(scrollByMock).toHaveBeenCalledWith({ left: 380, behavior: 'smooth' })
   })
 
+  it('opens recipe details when a card is clicked and closes with X', async () => {
+    const user = userEvent.setup()
+    render(<RecipeFeed />)
+
+    const openButtons = screen.getAllByLabelText(/Open Blueberry Pancakes recipe details/i)
+    await user.click(openButtons[0])
+
+    expect(screen.getByRole('dialog', { name: /Blueberry Pancakes details/i })).toBeInTheDocument()
+    expect(screen.getByText('Ingredients')).toBeInTheDocument()
+    expect(screen.getByText('Steps')).toBeInTheDocument()
+
+    await user.click(screen.getByLabelText('Close recipe details'))
+    expect(screen.queryByRole('dialog', { name: /Blueberry Pancakes details/i })).not.toBeInTheDocument()
+  })
+
+  it('shows recipe options menu from three-dot button', async () => {
+    const user = userEvent.setup()
+    render(<RecipeFeed />)
+
+    const openButtons = screen.getAllByLabelText(/Open Blueberry Pancakes recipe details/i)
+    await user.click(openButtons[0])
+
+    await user.click(screen.getByLabelText('Open recipe options'))
+    expect(screen.getByRole('menuitem', { name: 'Edit recipe (coming soon)' })).toBeInTheDocument()
+  })
+
   it('displays cuisine and difficulty metadata on cards', () => {
     render(<RecipeFeed />)
-    expect(screen.getAllByText('Italian').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('American').length).toBeGreaterThan(0)
     expect(screen.getAllByText('Easy').length).toBeGreaterThan(0)
   })
 })
