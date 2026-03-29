@@ -6,15 +6,16 @@ import '../App.css'
 
 function RecipeFeed() {
   const [selectedRecipe, setSelectedRecipe] = useState(null)
-  const pageTitle = `${MOCK_CURRENT_USER.firstName}'s Cookbook 🔥`
+  const pageTitle = `${MOCK_CURRENT_USER.firstName}'s Cookbook`
+  const tabTitle = `${MOCK_CURRENT_USER.firstName}'s Cookbook 🔥`
   const favoriteRecipes = MOCK_RECIPES.filter((recipe) => recipe.isFavorite)
   const breakfastRecipes = MOCK_RECIPES.filter((recipe) => recipe.tags.includes('breakfast'))
   const lunchRecipes = MOCK_RECIPES.filter((recipe) => recipe.tags.includes('lunch'))
   const dinnerRecipes = MOCK_RECIPES.filter((recipe) => recipe.tags.includes('dinner'))
 
   useEffect(() => {
-    document.title = pageTitle
-  }, [pageTitle])
+    document.title = tabTitle
+  }, [tabTitle])
 
   return (
     <main className="page">

@@ -7,7 +7,7 @@ import { MOCK_RECIPES } from './constants'
 describe('Recipe Feed', () => {
   it('renders the page heading', () => {
     render(<RecipeFeed />)
-    expect(screen.getByText("Mohamed's Cookbook 🔥")).toBeInTheDocument()
+    expect(screen.getByText("Mohamed's Cookbook")).toBeInTheDocument()
   })
 
   it('renders all carousel section titles', () => {
