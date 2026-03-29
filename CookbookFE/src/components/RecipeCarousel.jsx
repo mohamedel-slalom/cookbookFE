@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import RecipeCard from './RecipeCard'
 import PropTypes from 'prop-types'
 
@@ -11,10 +11,31 @@ import PropTypes from 'prop-types'
  */
 function RecipeCarousel({ title, recipes, onRecipeSelect }) {
   const recipeRowRef = useRef(null)
+  const [isScrollable, setIsScrollable] = useState(false)
+
+  useEffect(() => {
+    const row = recipeRowRef.current
+    if (!row) return undefined
+
+    const updateScrollableState = () => {
+      setIsScrollable(row.scrollWidth > row.clientWidth + 1)
+    }
+
+    updateScrollableState()
+
+    const resizeObserver = new ResizeObserver(updateScrollableState)
+    resizeObserver.observe(row)
+    window.addEventListener('resize', updateScrollableState)
+
+    return () => {
+      resizeObserver.disconnect()
+      window.removeEventListener('resize', updateScrollableState)
+    }
+  }, [recipes])
 
   const scrollRecipes = (direction) => {
     const row = recipeRowRef.current
-    if (!row) return
+    if (!row || !isScrollable) return
     row.scrollBy({
       left: direction === 'left' ? -380 : 380,
       behavior: 'smooth',
@@ -31,6 +52,7 @@ function RecipeCarousel({ title, recipes, onRecipeSelect }) {
             className="scrollButton"
             onClick={() => scrollRecipes('left')}
             aria-label={`Scroll ${title} recipes left`}
+            disabled={!isScrollable}
           >
             ‹
           </button>
@@ -39,6 +61,7 @@ function RecipeCarousel({ title, recipes, onRecipeSelect }) {
             className="scrollButton"
             onClick={() => scrollRecipes('right')}
             aria-label={`Scroll ${title} recipes right`}
+            disabled={!isScrollable}
           >
             ›
           </button>

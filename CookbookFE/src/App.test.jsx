@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi } from 'vitest'
 import RecipeFeed from './pages/RecipeFeed'
@@ -7,7 +7,7 @@ import { MOCK_RECIPES } from './constants'
 describe('Recipe Feed', () => {
   it('renders the page heading', () => {
     render(<RecipeFeed />)
-    expect(screen.getByText("Mohamed's Family Recipes")).toBeInTheDocument()
+    expect(screen.getByText("Mohamed's Cookbook")).toBeInTheDocument()
   })
 
   it('renders all carousel section titles', () => {
@@ -52,10 +52,58 @@ describe('Recipe Feed', () => {
     const scrollByMock = vi.fn()
     const rows = document.querySelectorAll('.recipeRow')
     const row = rows[0]
-    if (row) row.scrollBy = scrollByMock
+
+    if (row) {
+      row.scrollBy = scrollByMock
+      Object.defineProperty(row, 'scrollWidth', { value: 1200, configurable: true })
+      Object.defineProperty(row, 'clientWidth', { value: 700, configurable: true })
+      act(() => {
+        window.dispatchEvent(new Event('resize'))
+      })
+    }
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Scroll Favorites recipes right')).not.toBeDisabled()
+    })
 
     await user.click(screen.getByLabelText('Scroll Favorites recipes right'))
     expect(scrollByMock).toHaveBeenCalledWith({ left: 380, behavior: 'smooth' })
+  })
+
+  it('opens and closes add recipe modal', async () => {
+    const user = userEvent.setup()
+    render(<RecipeFeed />)
+
+    await user.click(screen.getByLabelText('Add recipe'))
+    expect(screen.getByRole('dialog', { name: /Add new recipe/i })).toBeInTheDocument()
+    expect(screen.getByText('Save recipe (coming soon)')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Cancel' }))
+    expect(screen.queryByRole('dialog', { name: /Add new recipe/i })).not.toBeInTheDocument()
+  })
+
+  it('locks body scrolling while recipe details modal is open', async () => {
+    const user = userEvent.setup()
+    render(<RecipeFeed />)
+
+    const openButtons = screen.getAllByLabelText(/Open Blueberry Pancakes recipe details/i)
+    await user.click(openButtons[0])
+
+    expect(document.body.style.overflow).toBe('hidden')
+
+    await user.click(screen.getByLabelText('Close recipe details'))
+    expect(document.body.style.overflow).toBe('')
+  })
+
+  it('locks body scrolling while add recipe modal is open', async () => {
+    const user = userEvent.setup()
+    render(<RecipeFeed />)
+
+    await user.click(screen.getByLabelText('Add recipe'))
+    expect(document.body.style.overflow).toBe('hidden')
+
+    await user.click(screen.getByLabelText('Close add recipe modal'))
+    expect(document.body.style.overflow).toBe('')
   })
 
   it('opens recipe details when a card is clicked and closes with X', async () => {

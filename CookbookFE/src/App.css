@@ -15,6 +15,30 @@
   margin-bottom: 2rem;
 }
 
+.heroHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.addRecipeButton {
+  width: 2.8rem;
+  height: 2.8rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.3);
+  color: #d6d35f;
+  font-size: 1.45rem;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.addRecipeButton:hover {
+  background: rgba(255, 255, 255, 0.65);
+}
+
 .eyebrow {
   color: #c9c65a;
   letter-spacing: 0.08em;
@@ -74,6 +98,17 @@
   background: rgba(255, 255, 255, 0.65);
 }
 
+.scrollButton:disabled {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(214, 211, 95, 0.45);
+  cursor: not-allowed;
+}
+
+.scrollButton:disabled:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
 .recipeRow {
   display: grid;
   grid-auto-flow: column;
@@ -84,15 +119,12 @@
   padding-inline: 0.4rem;
   padding-top: 0.4rem;
   padding-bottom: 0.75rem;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .recipeRow::-webkit-scrollbar {
-  height: 8px;
-}
-
-.recipeRow::-webkit-scrollbar-thumb {
-  background: rgba(0, 132, 113, 0.6);
-  border-radius: 999px;
+  display: none;
 }
 
 .recipeCard {
@@ -212,6 +244,7 @@
   background: rgba(0, 132, 113, 0.42);
   backdrop-filter: blur(2px);
   overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 1.25rem;
 }
 
@@ -336,4 +369,96 @@
   color: #d6d35f;
   display: grid;
   gap: 0.35rem;
+}
+
+.addRecipePanel {
+  width: min(900px, 96vw);
+}
+
+.addRecipeActions {
+  align-items: center;
+  justify-content: space-between;
+}
+
+.addRecipeHeading {
+  margin: 0;
+  font-size: clamp(1.35rem, 2.2vw, 1.8rem);
+}
+
+.addRecipeForm {
+  padding: 1.25rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.addRecipeGrid {
+  display: grid;
+  gap: 0.85rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.addRecipeField {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.95rem;
+}
+
+.addRecipeField input,
+.addRecipeField textarea,
+.addRecipeField select {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 10px;
+  background: rgba(11, 18, 32, 0.72);
+  color: #d6d35f;
+  padding: 0.62rem 0.68rem;
+  font: inherit;
+}
+
+.addRecipeField textarea {
+  resize: vertical;
+}
+
+.addRecipeField input::placeholder,
+.addRecipeField textarea::placeholder {
+  color: rgba(214, 211, 95, 0.6);
+}
+
+.addRecipeCheckbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.addRecipeFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.65rem;
+}
+
+.addRecipeSecondaryButton,
+.addRecipePrimaryButton {
+  border-radius: 999px;
+  padding: 0.55rem 0.95rem;
+  font: inherit;
+  cursor: pointer;
+}
+
+.addRecipeSecondaryButton {
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #d6d35f;
+  background: transparent;
+}
+
+.addRecipePrimaryButton {
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: rgba(214, 211, 95, 0.45);
+  background: rgba(255, 255, 255, 0.12);
+  cursor: not-allowed;
+}
+
+@media (max-width: 760px) {
+  .addRecipeGrid {
+    grid-template-columns: 1fr;
+  }
 }
