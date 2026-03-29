@@ -12,7 +12,7 @@
 }
 
 .hero {
-  margin-bottom: 1.75rem;
+  margin-bottom: 2rem;
 }
 
 .eyebrow {
@@ -27,9 +27,12 @@
   font-size: clamp(2rem, 5vw, 3rem);
 }
 
-.subtitle {
-  margin: 0;
-  color: #cbd5e1;
+.feedSection {
+  margin-bottom: 1.5rem;
+}
+
+.feedSection:last-of-type {
+  margin-bottom: 0;
 }
 
 .feedHeader {
