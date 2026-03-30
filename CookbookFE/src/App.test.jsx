@@ -66,7 +66,7 @@ describe('Recipe Feed', () => {
     render(<RecipeFeed />)
 
     const errorBanner = await screen.findByRole('alert')
-    expect(errorBanner).toHaveTextContent('Could not connect to backend at http://localhost:8080')
+    expect(errorBanner).toHaveTextContent('Backend down')
     expect(screen.queryAllByRole('article')).toHaveLength(0)
 
     await user.click(screen.getByLabelText('Dismiss backend error'))

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import PropTypes from 'prop-types'
 import AddRecipeModal from '../components/AddRecipeModal'
 import RecipeCarousel from '../components/RecipeCarousel'
 import RecipeDetailModal from '../components/RecipeDetailModal'
@@ -39,7 +40,7 @@ const toBackendRecipePayload = (recipe) => {
 
 const isEqualValue = (a, b) => JSON.stringify(a) === JSON.stringify(b)
 
-function RecipeFeed() {
+function RecipeFeed({ onUnauthorized = undefined, onLogout = undefined }) {
   const [selectedRecipe, setSelectedRecipe] = useState(null)
   const [isAddRecipeOpen, setIsAddRecipeOpen] = useState(false)
   const [editingRecipe, setEditingRecipe] = useState(null)
@@ -51,6 +52,15 @@ function RecipeFeed() {
   const breakfastRecipes = recipes.filter((recipe) => recipe.tags.includes('breakfast'))
   const lunchRecipes = recipes.filter((recipe) => recipe.tags.includes('lunch'))
   const dinnerRecipes = recipes.filter((recipe) => recipe.tags.includes('dinner'))
+
+  const handleUnauthorizedError = (error) => {
+    if (error?.status === 401) {
+      onUnauthorized?.()
+      return true
+    }
+
+    return false
+  }
 
   useEffect(() => {
     document.title = tabTitle
@@ -66,10 +76,15 @@ function RecipeFeed() {
           setRecipes(data.map(normalizeRecipe))
           setBackendError('')
         }
-      } catch {
+      } catch (error) {
         if (isMounted) {
+          if (error?.status === 401) {
+            onUnauthorized?.()
+            return
+          }
+
           setRecipes([])
-          setBackendError('Could not connect to backend at http://localhost:8080. Please ensure your Spring Boot API is running.')
+          setBackendError(error?.message || 'Could not connect to backend at http://localhost:8080. Please ensure your Spring Boot API is running.')
         }
       }
     }
@@ -79,7 +94,7 @@ function RecipeFeed() {
     return () => {
       isMounted = false
     }
-  }, [])
+  }, [onUnauthorized])
 
   useEffect(() => {
     const shouldLockPageScroll = Boolean(selectedRecipe) || isAddRecipeOpen || Boolean(editingRecipe)
@@ -101,16 +116,32 @@ function RecipeFeed() {
   }, [selectedRecipe, isAddRecipeOpen, editingRecipe])
 
   const handleCreateRecipe = async (recipeData) => {
-    const createdRecipe = await createRecipe(recipeData)
-    setRecipes((prev) => [normalizeRecipe(createdRecipe), ...prev])
-    setBackendError('')
+    try {
+      const createdRecipe = await createRecipe(recipeData)
+      setRecipes((prev) => [normalizeRecipe(createdRecipe), ...prev])
+      setBackendError('')
+    } catch (error) {
+      if (handleUnauthorizedError(error)) {
+        throw error
+      }
+
+      throw error
+    }
   }
 
   const handleDeleteRecipe = async (recipeId) => {
-    await deleteRecipe(recipeId)
-    setRecipes((prev) => prev.filter((recipe) => recipe.id !== recipeId))
-    setSelectedRecipe(null)
-    setBackendError('')
+    try {
+      await deleteRecipe(recipeId)
+      setRecipes((prev) => prev.filter((recipe) => recipe.id !== recipeId))
+      setSelectedRecipe(null)
+      setBackendError('')
+    } catch (error) {
+      if (handleUnauthorizedError(error)) {
+        throw error
+      }
+
+      throw error
+    }
   }
 
   const handleStartEditRecipe = (recipe) => {
@@ -135,10 +166,18 @@ function RecipeFeed() {
       return
     }
 
-    const updatedRecipe = await patchRecipe(recipeId, changedPatch)
-    setRecipes((prev) => prev.map((recipe) => (recipe.id === recipeId ? normalizeRecipe(updatedRecipe) : recipe)))
-    setEditingRecipe(null)
-    setBackendError('')
+    try {
+      const updatedRecipe = await patchRecipe(recipeId, changedPatch)
+      setRecipes((prev) => prev.map((recipe) => (recipe.id === recipeId ? normalizeRecipe(updatedRecipe) : recipe)))
+      setEditingRecipe(null)
+      setBackendError('')
+    } catch (error) {
+      if (handleUnauthorizedError(error)) {
+        throw error
+      }
+
+      throw error
+    }
   }
 
   return (
@@ -164,15 +203,20 @@ function RecipeFeed() {
             <h1 className="title">{pageTitle}</h1>
           </div>
 
-          <button
-            type="button"
-            className="addRecipeButton"
-            aria-label="Add recipe"
-            title="Add recipe"
-            onClick={() => setIsAddRecipeOpen(true)}
-          >
-            ⊕
-          </button>
+          <div className="heroActions">
+            <button
+              type="button"
+              className="addRecipeButton"
+              aria-label="Add recipe"
+              title="Add recipe"
+              onClick={() => setIsAddRecipeOpen(true)}
+            >
+              ⊕
+            </button>
+            <button type="button" className="logoutButton" onClick={onLogout}>
+              Logout
+            </button>
+          </div>
         </div>
       </section>
 
@@ -200,6 +244,11 @@ function RecipeFeed() {
       )}
     </main>
   )
+}
+
+RecipeFeed.propTypes = {
+  onUnauthorized: PropTypes.func,
+  onLogout: PropTypes.func,
 }
 
 export default RecipeFeed
