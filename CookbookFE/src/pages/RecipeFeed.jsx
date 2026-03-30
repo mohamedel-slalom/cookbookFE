@@ -2,22 +2,50 @@ import { useEffect, useState } from 'react'
 import AddRecipeModal from '../components/AddRecipeModal'
 import RecipeCarousel from '../components/RecipeCarousel'
 import RecipeDetailModal from '../components/RecipeDetailModal'
-import { MOCK_CURRENT_USER, MOCK_RECIPES } from '../constants'
+import { MOCK_CURRENT_USER } from '../constants'
+import { fetchRecipes } from '../services/recipeService'
 import '../App.css'
 
 function RecipeFeed() {
   const [selectedRecipe, setSelectedRecipe] = useState(null)
   const [isAddRecipeOpen, setIsAddRecipeOpen] = useState(false)
+  const [recipes, setRecipes] = useState([])
+  const [backendError, setBackendError] = useState('')
   const pageTitle = `${MOCK_CURRENT_USER.firstName}'s Cookbook`
   const tabTitle = `${MOCK_CURRENT_USER.firstName}'s Cookbook\u2003🍳`
-  const favoriteRecipes = MOCK_RECIPES.filter((recipe) => recipe.isFavorite)
-  const breakfastRecipes = MOCK_RECIPES.filter((recipe) => recipe.tags.includes('breakfast'))
-  const lunchRecipes = MOCK_RECIPES.filter((recipe) => recipe.tags.includes('lunch'))
-  const dinnerRecipes = MOCK_RECIPES.filter((recipe) => recipe.tags.includes('dinner'))
+  const favoriteRecipes = recipes.filter((recipe) => recipe.isFavorite)
+  const breakfastRecipes = recipes.filter((recipe) => recipe.tags.includes('breakfast'))
+  const lunchRecipes = recipes.filter((recipe) => recipe.tags.includes('lunch'))
+  const dinnerRecipes = recipes.filter((recipe) => recipe.tags.includes('dinner'))
 
   useEffect(() => {
     document.title = tabTitle
   }, [tabTitle])
+
+  useEffect(() => {
+    let isMounted = true
+
+    const loadRecipes = async () => {
+      try {
+        const data = await fetchRecipes()
+        if (isMounted) {
+          setRecipes(data)
+          setBackendError('')
+        }
+      } catch {
+        if (isMounted) {
+          setRecipes([])
+          setBackendError('Could not connect to backend at http://localhost:8080. Please ensure your Spring Boot API is running.')
+        }
+      }
+    }
+
+    loadRecipes()
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
   useEffect(() => {
     const shouldLockPageScroll = Boolean(selectedRecipe) || isAddRecipeOpen
@@ -40,6 +68,20 @@ function RecipeFeed() {
 
   return (
     <main className="page">
+      {backendError && (
+        <aside className="backendErrorBanner" role="alert" aria-live="polite">
+          <p>{backendError}</p>
+          <button
+            type="button"
+            className="backendErrorCloseButton"
+            aria-label="Dismiss backend error"
+            onClick={() => setBackendError('')}
+          >
+            ✕
+          </button>
+        </aside>
+      )}
+
       <section className="hero">
         <div className="heroHeader">
           <div>

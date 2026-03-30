@@ -39,6 +39,44 @@
   background: rgba(255, 255, 255, 0.65);
 }
 
+.backendErrorBanner {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 70;
+  width: min(420px, calc(100vw - 2rem));
+  background: rgba(185, 28, 28, 0.95);
+  border: 1px solid rgba(254, 202, 202, 0.45);
+  color: #fff5f5;
+  border-radius: 12px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35);
+  padding: 0.85rem 2.4rem 0.85rem 0.9rem;
+}
+
+.backendErrorBanner p {
+  margin: 0;
+  line-height: 1.35;
+  font-size: 0.92rem;
+}
+
+.backendErrorCloseButton {
+  position: absolute;
+  top: 0.45rem;
+  right: 0.45rem;
+  width: 1.8rem;
+  height: 1.8rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff5f5;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.backendErrorCloseButton:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
 .eyebrow {
   color: #c9c65a;
   letter-spacing: 0.08em;

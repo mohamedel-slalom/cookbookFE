@@ -1,25 +1,66 @@
 import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, it, expect, vi } from 'vitest'
+import { beforeEach, describe, it, expect, vi } from 'vitest'
+import { fetchRecipes } from './services/recipeService'
 import RecipeFeed from './pages/RecipeFeed'
 import { MOCK_RECIPES } from './constants'
 
+vi.mock('./services/recipeService', () => ({
+  fetchRecipes: vi.fn(),
+}))
+
+const waitForRecipesToRender = async () => {
+  await waitFor(() => {
+    expect(screen.getAllByRole('article').length).toBeGreaterThan(0)
+  })
+}
+
 describe('Recipe Feed', () => {
-  it('renders the page heading', () => {
-    render(<RecipeFeed />)
-    expect(screen.getByText("Mohamed's Cookbook")).toBeInTheDocument()
+  beforeEach(() => {
+    fetchRecipes.mockResolvedValue(MOCK_RECIPES)
   })
 
-  it('renders all carousel section titles', () => {
+  it('renders the page heading', async () => {
     render(<RecipeFeed />)
+    expect(screen.getByText("Mohamed's Cookbook")).toBeInTheDocument()
+    await waitFor(() => {
+      expect(fetchRecipes).toHaveBeenCalled()
+    })
+  })
+
+  it('fetches recipes on mount', async () => {
+    render(<RecipeFeed />)
+    await waitFor(() => {
+      expect(fetchRecipes).toHaveBeenCalled()
+    })
+  })
+
+  it('shows and dismisses backend error banner when fetch fails', async () => {
+    const user = userEvent.setup()
+    fetchRecipes.mockRejectedValueOnce(new Error('Backend down'))
+
+    render(<RecipeFeed />)
+
+    const errorBanner = await screen.findByRole('alert')
+    expect(errorBanner).toHaveTextContent('Could not connect to backend at http://localhost:8080')
+    expect(screen.queryAllByRole('article')).toHaveLength(0)
+
+    await user.click(screen.getByLabelText('Dismiss backend error'))
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+  })
+
+  it('renders all carousel section titles', async () => {
+    render(<RecipeFeed />)
+    await waitForRecipesToRender()
     expect(screen.getByText('Favorites')).toBeInTheDocument()
     expect(screen.getByText('Breakfast')).toBeInTheDocument()
     expect(screen.getByText('Lunch')).toBeInTheDocument()
     expect(screen.getByText('Dinner')).toBeInTheDocument()
   })
 
-  it('renders recipe cards in each carousel', () => {
+  it('renders recipe cards in each carousel', async () => {
     render(<RecipeFeed />)
+    await waitForRecipesToRender()
     const cards = screen.getAllByRole('article')
     const expectedCardCount = MOCK_RECIPES.filter((recipe) => recipe.isFavorite).length
       + MOCK_RECIPES.filter((recipe) => recipe.tags.includes('breakfast')).length
@@ -29,16 +70,18 @@ describe('Recipe Feed', () => {
     expect(cards).toHaveLength(expectedCardCount)
   })
 
-  it('renders only tagged recipes in each carousel', () => {
+  it('renders only tagged recipes in each carousel', async () => {
     render(<RecipeFeed />)
+    await waitForRecipesToRender()
     expect(screen.getAllByText('Blueberry Pancakes')).toHaveLength(2)
     expect(screen.getAllByText('Spicy Chicken Tacos')).toHaveLength(2)
     expect(screen.getAllByText('Mushroom Risotto')).toHaveLength(2)
     expect(screen.queryByText('Creamy Garlic Pasta')).not.toBeInTheDocument()
   })
 
-  it('renders scroll buttons for each carousel', () => {
+  it('renders scroll buttons for each carousel', async () => {
     render(<RecipeFeed />)
+    await waitForRecipesToRender()
     expect(screen.getByLabelText('Scroll Favorites recipes left')).toBeInTheDocument()
     expect(screen.getByLabelText('Scroll Breakfast recipes left')).toBeInTheDocument()
     expect(screen.getByLabelText('Scroll Lunch recipes left')).toBeInTheDocument()
@@ -48,6 +91,7 @@ describe('Recipe Feed', () => {
   it('calls scrollBy on carousel scroll buttons', async () => {
     const user = userEvent.setup()
     render(<RecipeFeed />)
+    await waitForRecipesToRender()
 
     const scrollByMock = vi.fn()
     const rows = document.querySelectorAll('.recipeRow')
@@ -73,6 +117,7 @@ describe('Recipe Feed', () => {
   it('opens and closes add recipe modal', async () => {
     const user = userEvent.setup()
     render(<RecipeFeed />)
+    await waitForRecipesToRender()
 
     await user.click(screen.getByLabelText('Add recipe'))
     expect(screen.getByRole('dialog', { name: /Add new recipe/i })).toBeInTheDocument()
@@ -85,6 +130,7 @@ describe('Recipe Feed', () => {
   it('locks body scrolling while recipe details modal is open', async () => {
     const user = userEvent.setup()
     render(<RecipeFeed />)
+    await waitForRecipesToRender()
 
     const openButtons = screen.getAllByLabelText(/Open Blueberry Pancakes recipe details/i)
     await user.click(openButtons[0])
@@ -98,6 +144,7 @@ describe('Recipe Feed', () => {
   it('locks body scrolling while add recipe modal is open', async () => {
     const user = userEvent.setup()
     render(<RecipeFeed />)
+    await waitForRecipesToRender()
 
     await user.click(screen.getByLabelText('Add recipe'))
     expect(document.body.style.overflow).toBe('hidden')
@@ -109,6 +156,7 @@ describe('Recipe Feed', () => {
   it('opens recipe details when a card is clicked and closes with X', async () => {
     const user = userEvent.setup()
     render(<RecipeFeed />)
+    await waitForRecipesToRender()
 
     const openButtons = screen.getAllByLabelText(/Open Blueberry Pancakes recipe details/i)
     await user.click(openButtons[0])
@@ -124,6 +172,7 @@ describe('Recipe Feed', () => {
   it('shows recipe options menu from three-dot button', async () => {
     const user = userEvent.setup()
     render(<RecipeFeed />)
+    await waitForRecipesToRender()
 
     const openButtons = screen.getAllByLabelText(/Open Blueberry Pancakes recipe details/i)
     await user.click(openButtons[0])
@@ -132,8 +181,9 @@ describe('Recipe Feed', () => {
     expect(screen.getByRole('menuitem', { name: 'Edit recipe (coming soon)' })).toBeInTheDocument()
   })
 
-  it('displays cuisine and difficulty metadata on cards', () => {
+  it('displays cuisine and difficulty metadata on cards', async () => {
     render(<RecipeFeed />)
+    await waitForRecipesToRender()
     expect(screen.getAllByText('American').length).toBeGreaterThan(0)
     expect(screen.getAllByText('Easy').length).toBeGreaterThan(0)
   })
