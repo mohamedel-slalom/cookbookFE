@@ -1,12 +1,13 @@
 import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, it, expect, vi } from 'vitest'
-import { fetchRecipes } from './services/recipeService'
+import { createRecipe, fetchRecipes } from './services/recipeService'
 import RecipeFeed from './pages/RecipeFeed'
 import { MOCK_RECIPES } from './constants'
 
 vi.mock('./services/recipeService', () => ({
   fetchRecipes: vi.fn(),
+  createRecipe: vi.fn(),
 }))
 
 const waitForRecipesToRender = async () => {
@@ -18,6 +19,20 @@ const waitForRecipesToRender = async () => {
 describe('Recipe Feed', () => {
   beforeEach(() => {
     fetchRecipes.mockResolvedValue(MOCK_RECIPES)
+    createRecipe.mockResolvedValue({
+      id: 999,
+      title: 'Egg Fried Rice',
+      description: 'Quick rice dish',
+      cuisine: 'Asian',
+      time: '20 min',
+      difficulty: 'Easy',
+      servingsCount: 4,
+      imageUrl: 'https://images.unsplash.com/photo-1495546968767-f0573cca821e?auto=format&fit=crop&w=1400&q=80',
+      ingredients: ['2 eggs', '2 cups rice'],
+      steps: ['Scramble eggs', 'Stir-fry rice'],
+      tags: ['lunch', 'dinner'],
+      isFavorite: false,
+    })
   })
 
   it('renders the page heading', async () => {
@@ -121,9 +136,45 @@ describe('Recipe Feed', () => {
 
     await user.click(screen.getByLabelText('Add recipe'))
     expect(screen.getByRole('dialog', { name: /Add new recipe/i })).toBeInTheDocument()
-    expect(screen.getByText('Save recipe (coming soon)')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Save recipe' })).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Cancel' }))
+    expect(screen.queryByRole('dialog', { name: /Add new recipe/i })).not.toBeInTheDocument()
+  })
+
+  it('submits add recipe modal to backend create endpoint', async () => {
+    const user = userEvent.setup()
+    render(<RecipeFeed />)
+    await waitForRecipesToRender()
+
+    await user.click(screen.getByLabelText('Add recipe'))
+
+    await user.type(screen.getByLabelText('Recipe title'), 'Egg Fried Rice')
+    await user.type(screen.getByLabelText('Description'), 'Quick rice dish')
+    await user.type(screen.getByLabelText('Cuisine'), 'Asian')
+    await user.type(screen.getByLabelText('Time'), '20 min')
+    await user.type(screen.getByLabelText('Servings'), '4')
+    await user.type(screen.getByLabelText('Ingredients (one per line)'), '2 eggs\n2 cups rice')
+    await user.type(screen.getByLabelText('Steps (one per line)'), 'Scramble eggs\nStir-fry rice')
+    await user.type(screen.getByLabelText('Tags (comma separated)'), 'lunch, dinner')
+
+    await user.click(screen.getByRole('button', { name: 'Save recipe' }))
+
+    await waitFor(() => {
+      expect(createRecipe).toHaveBeenCalledWith({
+        title: 'Egg Fried Rice',
+        description: 'Quick rice dish',
+        cuisine: 'Asian',
+        time: '20 min',
+        difficulty: 'Easy',
+        servingsCount: 4,
+        ingredients: ['2 eggs', '2 cups rice'],
+        steps: ['Scramble eggs', 'Stir-fry rice'],
+        tags: ['lunch', 'dinner'],
+        isFavorite: false,
+        images: [],
+      })
+    })
     expect(screen.queryByRole('dialog', { name: /Add new recipe/i })).not.toBeInTheDocument()
   })
 

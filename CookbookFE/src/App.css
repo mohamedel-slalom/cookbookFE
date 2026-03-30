@@ -474,6 +474,16 @@
   gap: 0.65rem;
 }
 
+.addRecipeError {
+  margin: 0;
+  color: #fecaca;
+  background: rgba(185, 28, 28, 0.35);
+  border: 1px solid rgba(254, 202, 202, 0.35);
+  border-radius: 10px;
+  padding: 0.55rem 0.65rem;
+  font-size: 0.9rem;
+}
+
 .addRecipeSecondaryButton,
 .addRecipePrimaryButton {
   border-radius: 999px;
@@ -493,6 +503,17 @@
   color: rgba(214, 211, 95, 0.45);
   background: rgba(255, 255, 255, 0.12);
   cursor: not-allowed;
+}
+
+.addRecipePrimaryButton:not(:disabled) {
+  border-color: rgba(196, 95, 63, 0.45);
+  color: #fff5f5;
+  background: #c45f3f;
+  cursor: pointer;
+}
+
+.addRecipePrimaryButton:not(:disabled):hover {
+  background: #db6f4e;
 }
 
 @media (max-width: 760px) {
