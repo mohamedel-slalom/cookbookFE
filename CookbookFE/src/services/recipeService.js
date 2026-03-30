@@ -59,3 +59,36 @@ export async function deleteRecipe(recipeId) {
     throw new Error(errorMessage)
   }
 }
+
+export async function patchRecipe(recipeId, recipePatch) {
+  const response = await fetch(`${API_BASE_URL}/api/recipes/patchRecipe/${recipeId}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(recipePatch),
+  })
+
+  if (!response.ok) {
+    let errorMessage = 'Failed to update recipe'
+
+    try {
+      const contentType = response.headers.get('content-type') || ''
+      if (contentType.includes('application/json')) {
+        const data = await response.json()
+        errorMessage = data?.message || errorMessage
+      } else {
+        const text = await response.text()
+        if (text?.trim()) {
+          errorMessage = text.trim()
+        }
+      }
+    } catch {
+      // no-op
+    }
+
+    throw new Error(errorMessage)
+  }
+
+  return response.json()
+}

@@ -1,7 +1,7 @@
 import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, it, expect, vi } from 'vitest'
-import { createRecipe, deleteRecipe, fetchRecipes } from './services/recipeService'
+import { createRecipe, deleteRecipe, fetchRecipes, patchRecipe } from './services/recipeService'
 import RecipeFeed from './pages/RecipeFeed'
 import { MOCK_RECIPES } from './constants'
 
@@ -9,6 +9,7 @@ vi.mock('./services/recipeService', () => ({
   fetchRecipes: vi.fn(),
   createRecipe: vi.fn(),
   deleteRecipe: vi.fn(),
+  patchRecipe: vi.fn(),
 }))
 
 const waitForRecipesToRender = async () => {
@@ -35,6 +36,12 @@ describe('Recipe Feed', () => {
       isFavorite: false,
     })
     deleteRecipe.mockResolvedValue(undefined)
+    patchRecipe.mockResolvedValue({
+      ...MOCK_RECIPES[0],
+      title: 'Blueberry Pancakes Updated',
+      servingsCount: 4,
+      images: ['https://images.unsplash.com/photo-1528207776546-365bb710ee93?auto=format&fit=crop&w=1400&q=80'],
+    })
   })
 
   it('renders the page heading', async () => {
@@ -231,8 +238,34 @@ describe('Recipe Feed', () => {
     await user.click(openButtons[0])
 
     await user.click(screen.getByLabelText('Open recipe options'))
-    expect(screen.getByRole('menuitem', { name: 'Edit recipe (coming soon)' })).toBeInTheDocument()
+    expect(screen.getByRole('menuitem', { name: 'Edit recipe' })).toBeInTheDocument()
     expect(screen.getByRole('menuitem', { name: 'Delete recipe' })).toBeInTheDocument()
+  })
+
+  it('opens pre-populated edit modal and patches only changed fields', async () => {
+    const user = userEvent.setup()
+    render(<RecipeFeed />)
+    await waitForRecipesToRender()
+
+    const openButtons = screen.getAllByLabelText(/Open Blueberry Pancakes recipe details/i)
+    await user.click(openButtons[0])
+
+    await user.click(screen.getByLabelText('Open recipe options'))
+    await user.click(screen.getByRole('menuitem', { name: 'Edit recipe' }))
+
+    expect(screen.getByRole('dialog', { name: /Add new recipe/i })).toBeInTheDocument()
+    const titleInput = screen.getByLabelText('Recipe title')
+    expect(titleInput).toHaveValue('Blueberry Pancakes')
+
+    await user.clear(titleInput)
+    await user.type(titleInput, 'Blueberry Pancakes Updated')
+    await user.click(screen.getByRole('button', { name: 'Save changes' }))
+
+    await waitFor(() => {
+      expect(patchRecipe).toHaveBeenCalledWith(1, {
+        title: 'Blueberry Pancakes Updated',
+      })
+    })
   })
 
   it('opens delete confirmation and cancels deletion', async () => {

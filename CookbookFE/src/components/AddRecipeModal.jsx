@@ -15,6 +15,20 @@ const INITIAL_FORM_DATA = {
   isFavorite: false,
 }
 
+const toInitialFormData = (initialValues = {}) => ({
+  title: initialValues.title || '',
+  description: initialValues.description || '',
+  cuisine: initialValues.cuisine || '',
+  time: initialValues.time || '',
+  difficulty: initialValues.difficulty || 'Easy',
+  servings: String(initialValues.servings ?? initialValues.servingsCount ?? ''),
+  ingredients: Array.isArray(initialValues.ingredients) ? initialValues.ingredients.join('\n') : '',
+  steps: Array.isArray(initialValues.steps) ? initialValues.steps.join('\n') : '',
+  tags: Array.isArray(initialValues.tags) ? initialValues.tags.join(', ') : '',
+  imageUrl: initialValues.imageUrl || (Array.isArray(initialValues.images) ? initialValues.images[0] || '' : ''),
+  isFavorite: Boolean(initialValues.isFavorite),
+})
+
 const parseLineList = (value) => value
   .split('\n')
   .map((entry) => entry.trim())
@@ -25,10 +39,11 @@ const parseCommaList = (value) => value
   .map((entry) => entry.trim())
   .filter(Boolean)
 
-function AddRecipeModal({ onClose, onSubmit }) {
-  const [formData, setFormData] = useState(INITIAL_FORM_DATA)
+function AddRecipeModal({ onClose, onSubmit, initialValues = null, mode = 'create' }) {
+  const [formData, setFormData] = useState(() => (mode === 'edit' ? toInitialFormData(initialValues) : INITIAL_FORM_DATA))
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState('')
+  const isEditMode = mode === 'edit'
 
   const isFormValid = useMemo(() => {
     const ingredients = parseLineList(formData.ingredients)
@@ -97,7 +112,7 @@ function AddRecipeModal({ onClose, onSubmit }) {
     <div className="detailOverlay" role="dialog" aria-modal="true" aria-label="Add new recipe">
       <div className="detailPanel addRecipePanel">
         <div className="detailActions addRecipeActions">
-          <h2 className="addRecipeHeading">Add Recipe</h2>
+          <h2 className="addRecipeHeading">{isEditMode ? 'Edit Recipe' : 'Add Recipe'}</h2>
           <button type="button" className="detailIconButton" aria-label="Close add recipe modal" onClick={onClose}>
             ✕
           </button>
@@ -192,7 +207,7 @@ function AddRecipeModal({ onClose, onSubmit }) {
               Cancel
             </button>
             <button type="submit" className="addRecipePrimaryButton" disabled={!isFormValid || isSubmitting}>
-              {isSubmitting ? 'Saving...' : 'Save recipe'}
+              {isSubmitting ? 'Saving...' : isEditMode ? 'Save changes' : 'Save recipe'}
             </button>
           </div>
         </form>
@@ -204,6 +219,22 @@ function AddRecipeModal({ onClose, onSubmit }) {
 AddRecipeModal.propTypes = {
   onClose: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
+  initialValues: PropTypes.shape({
+    title: PropTypes.string,
+    description: PropTypes.string,
+    cuisine: PropTypes.string,
+    time: PropTypes.string,
+    difficulty: PropTypes.string,
+    servings: PropTypes.number,
+    servingsCount: PropTypes.number,
+    ingredients: PropTypes.arrayOf(PropTypes.string),
+    steps: PropTypes.arrayOf(PropTypes.string),
+    tags: PropTypes.arrayOf(PropTypes.string),
+    imageUrl: PropTypes.string,
+    images: PropTypes.arrayOf(PropTypes.string),
+    isFavorite: PropTypes.bool,
+  }),
+  mode: PropTypes.oneOf(['create', 'edit']),
 }
 
 export default AddRecipeModal

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import PropTypes from 'prop-types'
 
-function RecipeDetailModal({ recipe, onClose, onDelete }) {
+function RecipeDetailModal({ recipe, onClose, onDelete, onEdit }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
@@ -41,8 +41,16 @@ function RecipeDetailModal({ recipe, onClose, onDelete }) {
 
             {isMenuOpen && (
               <div className="detailMenu" role="menu" aria-label="Recipe options">
-                <button type="button" className="detailMenuItem" role="menuitem" onClick={() => setIsMenuOpen(false)}>
-                  Edit recipe (coming soon)
+                <button
+                  type="button"
+                  className="detailMenuItem"
+                  role="menuitem"
+                  onClick={() => {
+                    setIsMenuOpen(false)
+                    onEdit(recipe)
+                  }}
+                >
+                  Edit recipe
                 </button>
                 <button
                   type="button"
@@ -141,6 +149,7 @@ RecipeDetailModal.propTypes = {
   }).isRequired,
   onClose: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
+  onEdit: PropTypes.func.isRequired,
 }
 
 export default RecipeDetailModal
