@@ -3,7 +3,7 @@ import AddRecipeModal from '../components/AddRecipeModal'
 import RecipeCarousel from '../components/RecipeCarousel'
 import RecipeDetailModal from '../components/RecipeDetailModal'
 import { MOCK_CURRENT_USER } from '../constants'
-import { createRecipe, fetchRecipes } from '../services/recipeService'
+import { createRecipe, deleteRecipe, fetchRecipes } from '../services/recipeService'
 import '../App.css'
 
 const DEFAULT_RECIPE_IMAGE_URL = 'https://images.unsplash.com/photo-1495546968767-f0573cca821e?auto=format&fit=crop&w=1400&q=80'
@@ -84,6 +84,13 @@ function RecipeFeed() {
     setBackendError('')
   }
 
+  const handleDeleteRecipe = async (recipeId) => {
+    await deleteRecipe(recipeId)
+    setRecipes((prev) => prev.filter((recipe) => recipe.id !== recipeId))
+    setSelectedRecipe(null)
+    setBackendError('')
+  }
+
   return (
     <main className="page">
       {backendError && (
@@ -125,7 +132,13 @@ function RecipeFeed() {
       <RecipeCarousel title="Dinner" recipes={dinnerRecipes} onRecipeSelect={setSelectedRecipe} />
 
       {isAddRecipeOpen && <AddRecipeModal onClose={() => setIsAddRecipeOpen(false)} onSubmit={handleCreateRecipe} />}
-      {selectedRecipe && <RecipeDetailModal recipe={selectedRecipe} onClose={() => setSelectedRecipe(null)} />}
+      {selectedRecipe && (
+        <RecipeDetailModal
+          recipe={selectedRecipe}
+          onClose={() => setSelectedRecipe(null)}
+          onDelete={handleDeleteRecipe}
+        />
+      )}
     </main>
   )
 }

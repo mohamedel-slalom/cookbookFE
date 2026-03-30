@@ -355,6 +355,73 @@
   background: rgba(255, 255, 255, 0.52);
 }
 
+.detailMenuItemDanger {
+  color: #fecaca;
+}
+
+.detailMenuItemDanger:hover {
+  background: rgba(185, 28, 28, 0.35);
+}
+
+.confirmDeleteOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  background: rgba(2, 6, 23, 0.45);
+  padding: 1rem;
+}
+
+.confirmDeletePanel {
+  width: min(460px, 94vw);
+  border-radius: 14px;
+  border: 1px solid rgba(254, 202, 202, 0.35);
+  background: #7f1d1d;
+  color: #fff5f5;
+  padding: 1rem;
+  box-shadow: 0 22px 40px rgba(2, 6, 23, 0.55);
+}
+
+.confirmDeletePanel p {
+  margin: 0;
+  line-height: 1.35;
+}
+
+.confirmDeleteError {
+  margin-top: 0.7rem !important;
+  border-radius: 10px;
+  border: 1px solid rgba(254, 202, 202, 0.4);
+  background: rgba(0, 0, 0, 0.22);
+  padding: 0.5rem 0.6rem;
+}
+
+.confirmDeleteActions {
+  margin-top: 0.9rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.55rem;
+}
+
+.confirmDeleteButton {
+  border-radius: 999px;
+  border: 1px solid rgba(254, 202, 202, 0.35);
+  color: #fff5f5;
+  background: #dc2626;
+  padding: 0.55rem 0.95rem;
+  font: inherit;
+  cursor: pointer;
+}
+
+.confirmDeleteButton:hover {
+  background: #ef4444;
+}
+
+.confirmDeleteButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
 .detailImage {
   width: 100%;
   max-height: 440px;

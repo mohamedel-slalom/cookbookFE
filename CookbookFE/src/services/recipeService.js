@@ -38,3 +38,24 @@ export async function createRecipe(recipe) {
 
   return response.json()
 }
+
+export async function deleteRecipe(recipeId) {
+  const response = await fetch(`${API_BASE_URL}/api/recipes/deleteRecipe/${recipeId}`, {
+    method: 'DELETE',
+  })
+
+  if (!response.ok) {
+    let errorMessage = 'Failed to delete recipe'
+
+    try {
+      const text = await response.text()
+      if (text?.trim()) {
+        errorMessage = text.trim()
+      }
+    } catch {
+      // no-op
+    }
+
+    throw new Error(errorMessage)
+  }
+}

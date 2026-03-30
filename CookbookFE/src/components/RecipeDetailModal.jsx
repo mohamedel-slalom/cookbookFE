@@ -1,8 +1,29 @@
 import { useState } from 'react'
 import PropTypes from 'prop-types'
 
-function RecipeDetailModal({ recipe, onClose }) {
+function RecipeDetailModal({ recipe, onClose, onDelete }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState('')
+
+  const handleDeleteConfirm = () => {
+    if (isDeleting) return
+
+    setDeleteError('')
+    setIsDeleting(true)
+
+    onDelete(recipe.id)
+      .then(() => {
+        setIsDeleteConfirmOpen(false)
+      })
+      .catch((error) => {
+        setDeleteError(error?.message || 'Could not delete recipe. Please try again.')
+      })
+      .finally(() => {
+        setIsDeleting(false)
+      })
+  }
 
   return (
     <div className="detailOverlay" role="dialog" aria-modal="true" aria-label={`${recipe.title} details`}>
@@ -22,6 +43,17 @@ function RecipeDetailModal({ recipe, onClose }) {
               <div className="detailMenu" role="menu" aria-label="Recipe options">
                 <button type="button" className="detailMenuItem" role="menuitem" onClick={() => setIsMenuOpen(false)}>
                   Edit recipe (coming soon)
+                </button>
+                <button
+                  type="button"
+                  className="detailMenuItem detailMenuItemDanger"
+                  role="menuitem"
+                  onClick={() => {
+                    setIsMenuOpen(false)
+                    setIsDeleteConfirmOpen(true)
+                  }}
+                >
+                  Delete recipe
                 </button>
               </div>
             )}
@@ -64,6 +96,30 @@ function RecipeDetailModal({ recipe, onClose }) {
           </section>
         </div>
       </div>
+
+      {isDeleteConfirmOpen && (
+        <div className="confirmDeleteOverlay" role="dialog" aria-modal="true" aria-label="Confirm recipe deletion">
+          <div className="confirmDeletePanel">
+            <p>Are you sure you want to delete this recipe? This is irreversible.</p>
+
+            {deleteError && <p className="confirmDeleteError">{deleteError}</p>}
+
+            <div className="confirmDeleteActions">
+              <button
+                type="button"
+                className="addRecipeSecondaryButton"
+                onClick={() => setIsDeleteConfirmOpen(false)}
+                disabled={isDeleting}
+              >
+                Cancel
+              </button>
+              <button type="button" className="confirmDeleteButton" onClick={handleDeleteConfirm} disabled={isDeleting}>
+                {isDeleting ? 'Deleting...' : 'Confirm delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -84,6 +140,7 @@ RecipeDetailModal.propTypes = {
     isFavorite: PropTypes.bool.isRequired,
   }).isRequired,
   onClose: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
 }
 
 export default RecipeDetailModal

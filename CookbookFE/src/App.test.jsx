@@ -1,13 +1,14 @@
 import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, it, expect, vi } from 'vitest'
-import { createRecipe, fetchRecipes } from './services/recipeService'
+import { createRecipe, deleteRecipe, fetchRecipes } from './services/recipeService'
 import RecipeFeed from './pages/RecipeFeed'
 import { MOCK_RECIPES } from './constants'
 
 vi.mock('./services/recipeService', () => ({
   fetchRecipes: vi.fn(),
   createRecipe: vi.fn(),
+  deleteRecipe: vi.fn(),
 }))
 
 const waitForRecipesToRender = async () => {
@@ -33,6 +34,7 @@ describe('Recipe Feed', () => {
       tags: ['lunch', 'dinner'],
       isFavorite: false,
     })
+    deleteRecipe.mockResolvedValue(undefined)
   })
 
   it('renders the page heading', async () => {
@@ -230,6 +232,45 @@ describe('Recipe Feed', () => {
 
     await user.click(screen.getByLabelText('Open recipe options'))
     expect(screen.getByRole('menuitem', { name: 'Edit recipe (coming soon)' })).toBeInTheDocument()
+    expect(screen.getByRole('menuitem', { name: 'Delete recipe' })).toBeInTheDocument()
+  })
+
+  it('opens delete confirmation and cancels deletion', async () => {
+    const user = userEvent.setup()
+    render(<RecipeFeed />)
+    await waitForRecipesToRender()
+
+    const openButtons = screen.getAllByLabelText(/Open Blueberry Pancakes recipe details/i)
+    await user.click(openButtons[0])
+
+    await user.click(screen.getByLabelText('Open recipe options'))
+    await user.click(screen.getByRole('menuitem', { name: 'Delete recipe' }))
+
+    expect(screen.getByRole('dialog', { name: 'Confirm recipe deletion' })).toBeInTheDocument()
+    expect(screen.getByText('Are you sure you want to delete this recipe? This is irreversible.')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Cancel' }))
+    expect(screen.queryByRole('dialog', { name: 'Confirm recipe deletion' })).not.toBeInTheDocument()
+    expect(deleteRecipe).not.toHaveBeenCalled()
+  })
+
+  it('deletes recipe after confirmation', async () => {
+    const user = userEvent.setup()
+    render(<RecipeFeed />)
+    await waitForRecipesToRender()
+
+    const openButtons = screen.getAllByLabelText(/Open Blueberry Pancakes recipe details/i)
+    await user.click(openButtons[0])
+
+    await user.click(screen.getByLabelText('Open recipe options'))
+    await user.click(screen.getByRole('menuitem', { name: 'Delete recipe' }))
+    await user.click(screen.getByRole('button', { name: 'Confirm delete' }))
+
+    await waitFor(() => {
+      expect(deleteRecipe).toHaveBeenCalledWith(1)
+    })
+
+    expect(screen.queryByRole('dialog', { name: /Blueberry Pancakes details/i })).not.toBeInTheDocument()
   })
 
   it('displays cuisine and difficulty metadata on cards', async () => {
